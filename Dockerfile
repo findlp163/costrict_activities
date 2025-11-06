@@ -7,7 +7,7 @@ WORKDIR /app
 # 设置环境变量
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
-    FLASK_APP=server.py \
+    FLASK_APP=wsgi.py \
     FLASK_ENV=production
 
 # 安装系统依赖
@@ -26,5 +26,5 @@ COPY . .
 # 暴露端口
 EXPOSE 5000
 
-# 设置入口点命令
-CMD ["python", "server.py"]
+# 设置入口点命令 - 使用生产级WSGI服务器
+CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--workers", "2", "--timeout", "120", "--keepalive", "5", "--max-requests", "1000", "--max-requests-jitter", "50", "wsgi:application"]

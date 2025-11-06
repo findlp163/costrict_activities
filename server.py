@@ -1,12 +1,12 @@
 # 简单的 Python 后端服务器（使用 Flask）
-# 安装依赖：pip install flask flask-cors
+# 安装依赖：pip install flask flask-cors flask-admin
 
 from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
-from flask_sqlalchemy import SQLAlchemy
 import json
 import os
 from datetime import datetime
+import pytz
 import re
 from sqlalchemy import text
 
@@ -15,59 +15,19 @@ CORS(app)
 
 # 数据存储配置（ORM）
 DATA_FILE = 'users.json'  # 仅用于历史回退；默认不再使用
-DB_URL = os.getenv('DATABASE_URL', 'sqlite:///users2.db')
+DB_URL = os.getenv('DATABASE_URL', 'sqlite:///users.db')
 app.config['SQLALCHEMY_DATABASE_URI'] = DB_URL
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-db = SQLAlchemy(app)
+# Flask-Admin 配置
+app.config['SECRET_KEY'] = 'my-secret-key'  # 用于session和CSRF保护
 
-class Team(db.Model):
-    __tablename__ = 'teams'
-    # 自增整型主键
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    createdAt = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    updatedAt = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow) 
-    
-    # 团队基本信息
-    team_name = db.Column(db.String(50), nullable=False, unique=True)  # 团队名称（唯一）
-    competition_track = db.Column(db.String(50), nullable=False)  # 参赛赛道（技术挑战赛/创新应用赛）
-    project_name = db.Column(db.String(50), nullable=False)  # 作品名称
-    repo_url = db.Column(db.String(255))  # 代码仓库链接
-    costrict_uid = db.Column(db.String(50), nullable=False)  # CoStrict UID
-    
-    # 项目详细信息
-    project_intro = db.Column(db.Text)  # 项目简介 (200-500字)
-    tech_solution = db.Column(db.Text)  # 技术方案 (200-500字)
-    goals_and_outlook = db.Column(db.Text)  # 目标与展望 (200-500字)
-    
-    # 团队成员关系
-    members = db.relationship('TeamMember', backref='team', lazy=True, cascade='all, delete-orphan')
-
-
-class TeamMember(db.Model):
-    __tablename__ = 'team_members'
-    # 自增整型主键
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    createdAt = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)  # 提交时间
-    updatedAt = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)  # 最新提交时间
-    
-    # 关联团队
-    team_id = db.Column(db.Integer, db.ForeignKey('teams.id'), nullable=False)
-    # 团队基本信息
-    team_name = db.Column(db.String(50), nullable=False)  # 团队名称（冗余字段，便于查询）
-    
-    # 个人基本信息
-    name = db.Column(db.String(100), nullable=False)  # 姓名
-    is_captain = db.Column(db.Boolean, default=False)  # 是否为队长
-    school = db.Column(db.String(200), nullable=False)  # 学校/单位
-    department = db.Column(db.String(200), nullable=False)  # 学院/系别
-    major_grade = db.Column(db.String(200), nullable=False)  # 专业与年级
-    phone = db.Column(db.String(20), nullable=False)  # 联系电话
-    email = db.Column(db.String(200), nullable=False)  # 电子邮箱
-    student_id = db.Column(db.String(50))  # 学号（可选）
-    
-    # 项目角色
-    role = db.Column(db.String(100), nullable=False)  # 项目角色
-    tech_stack = db.Column(db.String(500))  # 技术栈/擅长领域
+# 导入数据模型和数据库实例
+from models import db, Team, TeamMember
+db.init_app(app)
+# 导入并设置Flask-Admin
+from admin import setup_admin
+# 设置Flask-Admin，但使用不同的URL前缀避免冲突
+admin_instance = setup_admin(app)
 
 def init_db():
     """改进的数据库初始化"""
@@ -92,8 +52,8 @@ def read_teams():
         for team in teams:
             team_data = {
                 'id': team.id,
-                'createdAt': (team.createdAt.isoformat() if team.createdAt else ''),
-                'updatedAt': (team.updatedAt.isoformat() if team.updatedAt else ''),
+                'createdAt': (team.createdAt.strftime('%Y-%m-%d %H:%M:%S') if team.createdAt else ''),
+                'updatedAt': (team.updatedAt.strftime('%Y-%m-%d %H:%M:%S') if team.updatedAt else ''),
                 'team_name': team.team_name,
                 'competition_track': team.competition_track,
                 'project_name': team.project_name,
@@ -129,7 +89,9 @@ def read_teams():
 
 def save_team(team_data, members_data):
     """保存团队和成员数据"""
-    now_dt = datetime.utcnow()
+    # 使用上海时间
+    shanghai_tz = pytz.timezone('Asia/Shanghai')
+    now_dt = datetime.now(shanghai_tz)
     
     try:
         # 检查团队名称是否已存在（通过team_name查找）
@@ -371,8 +333,8 @@ def get_team(team_id):
         
         team_data = {
             'id': team.id,
-            'createdAt': (team.createdAt.isoformat() if team.createdAt else ''),
-            'updatedAt': (team.updatedAt.isoformat() if team.updatedAt else ''),
+            'createdAt': (team.createdAt.strftime('%Y-%m-%d %H:%M:%S') if team.createdAt else ''),
+            'updatedAt': (team.updatedAt.strftime('%Y-%m-%d %H:%M:%S') if team.updatedAt else ''),
             'team_name': team.team_name,
             'competition_track': team.competition_track,
             'project_name': team.project_name,
@@ -419,7 +381,9 @@ if __name__ == '__main__':
     if not init_db():
         print("数据库初始化失败，服务器无法启动")
         exit(1)
-        
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    
+    # 根据环境变量决定是否启用调试模式
+    debug_mode = os.getenv('FLASK_ENV') == 'development'
+    app.run(debug=debug_mode, host='0.0.0.0', port=5000)
 
 
