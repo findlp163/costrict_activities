@@ -1,0 +1,48 @@
+# 使用更轻量的Alpine基础镜像
+FROM python:3.11-alpine
+
+# 设置工作目录
+WORKDIR /app
+
+# 设置环境变量减少内存占用
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    FLASK_APP=server.py \
+    FLASK_ENV=production \
+    PYTHONOPTIMIZE=1
+
+# 安装系统依赖（Alpine使用apk而不是apt）
+RUN apk add --no-cache \
+    gcc \
+    curl \
+    && rm -rf /var/cache/apk/*
+
+# 复制requirements文件并安装Python依赖
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# 添加非root用户以提高安全性
+RUN addgroup -g 1001 -S appgroup && \
+    adduser -u 1001 -S appuser -G appgroup
+
+# 复制应用代码
+COPY . .
+
+# 更改文件所有者为非root用户
+RUN chown -R appuser:appgroup /app
+
+# 切换到非root用户
+USER appuser
+
+# 暴露端口
+EXPOSE 5000
+
+# 设置健康检查
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:5000/ || exit 1
+
+# 设置优雅关闭信号
+STOPSIGNAL SIGTERM
+
+# 设置入口点命令
+CMD ["python", "server.py"]

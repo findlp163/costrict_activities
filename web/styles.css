@@ -1,0 +1,606 @@
+/* 基础样式重置 */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: #f5f6f7; /* 更贴近 InfoQ 的浅灰背景 */
+    min-height: 100vh;
+    padding: 24px;
+    line-height: 1.6;
+    color: #2f3133;
+}
+
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+/* 头部样式 */
+.header {
+    text-align: center;
+    color: #222;
+    margin-bottom: 12px;
+    padding: 0 4px;
+}
+
+/* 顶部图片横幅 */
+.hero-banner {
+    margin-bottom: 16px;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #e5e7eb;
+    background: #f0f2f5;
+}
+
+.hero-banner img {
+    display: block;
+    width: 100%;
+    height: 200px; /* 更接近参考截图高度 */
+    object-fit: cover;
+}
+
+/* 参赛须知 */
+.intro {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 20px 24px;
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.06);
+    margin-bottom: 16px;
+}
+
+.notice-list {
+    color: #4b5563;
+    font-size: 14px;
+    margin-left: 18px;
+}
+
+.notice-list li + li { margin-top: 8px; }
+
+.intro .link { color: #1277eb; text-decoration: none; }
+.intro .link:hover { text-decoration: underline; }
+
+.tip { color: #6b7280; font-size: 13px; margin-top: 12px; }
+
+.header h1 {
+    font-size: 1.75rem;
+    margin-bottom: 6px;
+    font-weight: 600;
+}
+
+.subtitle {
+    font-size: 0.95rem;
+    color: #5f6368;
+}
+
+/* 表单容器 */
+.form {
+    background: #fff;
+    border-radius: 8px;
+    padding: 28px;
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.06);
+    border: 1px solid #e5e7eb;
+}
+
+/* 内联输入（区号 + 手机号） */
+.input-inline {
+    display: block; /* 仅手机号输入时使用单列布局，避免过窄 */
+}
+
+.input-inline select {
+    padding: 10px 12px;
+    border: 1px solid #dcdfe6;
+    border-radius: 4px;
+    background-color: #fff;
+    font-size: 14px;
+}
+
+/* (移除学籍上传相关样式) */
+
+/* 单选按钮组 */
+.radio-group { display: flex; gap: 24px; }
+.radio-group label { color: #4b5563; font-weight: 500; }
+
+.form-section {
+    margin-bottom: 30px;
+}
+
+.form-section:not(:last-child) {
+    border-bottom: 1px solid #e0e0e0;
+    padding-bottom: 30px;
+}
+
+.form-section h2 {
+    font-size: 1.1rem;
+    color: #111827;
+    margin-bottom: 14px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #eef0f2;
+}
+
+/* 表单组 */
+.form-group {
+    margin-bottom: 10px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 700; /* 加粗 */
+    color: #111827; /* 加黑（更深的文本色） */
+    font-size: 0.95rem;
+}
+
+.field-description {
+    background: #f8f9fa;
+    border-left: 3px solid #1277eb;
+    padding: 10px 12px;
+    margin-bottom: 10px;
+    border-radius: 0 4px 4px 0;
+}
+
+.field-description p {
+    margin: 0 0 6px 0;
+    font-size: 13px;
+    color: #4b5563;
+    line-height: 1.5;
+}
+
+.field-description p:last-child {
+    margin-bottom: 0;
+}
+
+.form-group label.required::after {
+    content: " *";
+    color: #e74c3c;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #dcdfe6;
+    border-radius: 4px;
+    font-size: 14px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    font-family: inherit;
+    background-color: #fff;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: #1277eb; /* 蓝色主色 */
+    box-shadow: 0 0 0 3px rgba(18, 119, 235, 0.12);
+}
+
+.form-group input:invalid:not(:placeholder-shown),
+.form-group select:invalid:not(:placeholder-shown) {
+    border-color: #d93025;
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 120px;
+}
+
+/* 错误提示 */
+.error-message {
+    display: block;
+    color: #d93025;
+    font-size: 12px;
+    margin-top: 6px;
+    min-height: 18px;
+}
+
+/* 提交按钮 */
+.form-actions {
+    text-align: center;
+    margin-top: 24px;
+}
+
+.submit-btn {
+    background: #1277eb;
+    color: #fff;
+    border: 1px solid #1168cc;
+    padding: 10px 20px;
+    font-size: 14px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s ease, box-shadow 0.2s ease, transform 0.02s ease;
+    font-weight: 500;
+    min-width: 120px;
+}
+
+.submit-btn:hover:not(:disabled) {
+    background: #0f6ad3;
+    box-shadow: 0 2px 8px rgba(17, 104, 204, 0.24);
+}
+
+.submit-btn:active:not(:disabled) {
+    transform: translateY(1px);
+}
+
+.submit-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* 成功提示 */
+.success-message {
+    background: #fff;
+    border-radius: 8px;
+    padding: 24px;
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.06);
+    border: 1px solid #e5e7eb;
+    text-align: center;
+    margin-top: 16px;
+}
+
+/* 同意条款 */
+.agree {
+    margin-top: 8px;
+    margin-bottom: 8px;
+}
+
+.checkbox {
+    color: #4b5563;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+}
+
+.checkbox input {
+    margin-right: 6px;
+}
+
+.checkbox .link {
+    color: #1277eb;
+    text-decoration: none;
+    margin-left: 4px;
+}
+
+.checkbox .link:hover { text-decoration: underline; }
+
+.success-content {
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+.success-icon {
+    width: 48px;
+    height: 48px;
+    color: #22c55e;
+    margin: 0 auto 12px;
+    stroke-width: 2.5;
+}
+
+.success-content h3 {
+    font-size: 1.25rem;
+    color: #14532d;
+    margin-bottom: 6px;
+}
+
+.success-content p {
+    color: #666;
+    font-size: 1rem;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    body {
+        padding: 16px;
+    }
+
+    .header h1 {
+        font-size: 1.5rem;
+    }
+
+    .form {
+        padding: 20px;
+    }
+
+    .form-section h2 {
+        font-size: 1rem;
+    }
+
+    .submit-btn {
+        width: 100%;
+        padding: 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .header h1 {
+        font-size: 1.25rem;
+    }
+
+    .subtitle {
+        font-size: 0.9rem;
+    }
+
+    .form {
+        padding: 16px 14px;
+    }
+}
+
+/* 加载动画 */
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.btn-loader::before {
+    content: "";
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border: 2px solid rgba(255, 255, 255, 0.35);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin-right: 8px;
+    vertical-align: middle;
+}
+
+/* ========== Toast 通知 ========== */
+.toast-container {
+    position: fixed;
+    top: 16px;
+    right: 16px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    pointer-events: none; /* 允许点击穿透到页面（单个 toast 自行控制） */
+}
+
+.toast {
+    min-width: 240px;
+    max-width: 90vw;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-left-width: 4px;
+    border-radius: 6px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    padding: 10px 12px 10px 12px;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    color: #374151;
+    pointer-events: auto; /* 允许 hover/点击关闭 */
+    animation: toast-in 200ms ease-out;
+}
+
+.toast .toast-icon {
+    flex: 0 0 auto;
+    width: 18px;
+    height: 18px;
+    margin-top: 2px;
+}
+
+.toast .toast-content {
+    flex: 1 1 auto;
+}
+
+.toast .toast-title {
+    font-weight: 600;
+    font-size: 14px;
+    margin-bottom: 2px;
+}
+
+.toast .toast-message {
+    font-size: 13px;
+    color: #4b5563;
+}
+
+.toast .toast-close {
+    flex: 0 0 auto;
+    margin-left: 8px;
+    background: transparent;
+    border: none;
+    color: #9ca3af;
+    cursor: pointer;
+    padding: 2px;
+}
+
+.toast-info { border-left-color: #3b82f6; }
+.toast-success { border-left-color: #22c55e; }
+.toast-error { border-left-color: #ef4444; }
+
+@keyframes toast-in {
+    0% { opacity: 0; transform: translateY(-6px) scale(0.98); }
+    100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes toast-out {
+    0% { opacity: 1; transform: translateY(0) scale(1); }
+    100% { opacity: 0; transform: translateY(-6px) scale(0.98); }
+}
+
+@media (max-width: 480px) {
+    .toast-container {
+        left: 12px;
+        right: 12px;
+    }
+}
+
+/* 团队成员表单样式 */
+.member-item {
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    background-color: #fafafa;
+    position: relative;
+}
+
+.member-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.member-header h3 {
+    font-size: 1.1rem;
+    color: #111827;
+    margin: 0;
+    font-weight: 600;
+}
+
+.member-captain {
+    color: #4b5563;
+    font-size: 0.9rem;
+}
+
+.member-captain input {
+    margin-right: 6px;
+}
+
+.member-captain {
+    color: #4b5563;
+    font-size: 0.9rem;
+    padding: 4px 8px;
+    border-radius: 4px;
+    border: 1px solid #d1d5db;
+}
+
+.member-captain.captain-selected {
+    background-color: #dcfce7;
+    border: 1px solid #86efac;
+    color: #15803d;
+    font-weight: 600;
+}
+
+.member-remove {
+    margin-left: 12px;
+}
+
+.remove-member-btn {
+    background: #ef4444;
+    color: #fff;
+    border: none;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.remove-member-btn:hover {
+    background: #d62828;
+}
+
+.secondary-btn {
+    background: #6b7280;
+    color: #fff;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.member-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.toggle-btn {
+    background: #f3f4f6;
+    color: #374151;
+    border: 1px solid #d1d5db;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    margin-left: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+    top: -2px;
+}
+
+.toggle-btn:hover {
+    background: #e5e7eb;
+    border-color: #9ca3af;
+}
+
+.member-header h3 .toggle-btn {
+    font-size: 0.7rem;
+    padding: 2px 6px;
+    margin-left: 8px;
+}
+
+.member-content {
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.member-name-display {
+    color: #6b7280;
+    font-weight: 500;
+    font-size: 0.9rem;
+}
+
+.secondary-btn:hover {
+    background: #4b5563;
+}
+
+/* 文本框样式调整 */
+.form-group textarea {
+    resize: vertical;
+    min-height: 120px;
+    line-height: 1.5;
+}
+
+/* 联系我们页脚 */
+.contact-footer {
+    background: #fff;
+    border-top: 1px solid #e5e7eb;
+    margin-top: 32px;
+    padding: 24px 0;
+    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.contact-footer h3 {
+    font-size: 1.1rem;
+    color: #111827;
+    margin-bottom: 12px;
+    font-weight: 600;
+}
+
+.contact-info p {
+    color: #4b5563;
+    font-size: 14px;
+    margin-bottom: 8px;
+    line-height: 1.5;
+}
+
+.contact-info p:last-child {
+    margin-bottom: 0;
+}
+
+.qr-code-container {
+    margin-top: 12px;
+    text-align: left;
+}
+
+.qr-code {
+    max-width: 180px;
+    height: auto;
+    border: 1px solid #e5e7eb;
+    border-radius: 4px;
+    padding: 4px;
+    background: #fff;
+}

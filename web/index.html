@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>码上AI·2025深信服CoStrict校园挑战赛</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="hero-banner" role="img" aria-label="2025 FinTechathon 深圳国际金融科技大赛 海报">
+                <img src="https://static001.infoq.cn/resource/image/9d/7b/9d67579270df0a77319b202bc20b717b.jpg" alt="2025 FinTechathon 深圳国际金融科技大赛 海报">
+            </div>
+            <h1>码上AI·2025深信服CoStrict校园挑战赛</h1>
+            <p class="subtitle">在线报名表单</p>
+        </header>
+
+        <section class="intro">
+            <ol class="notice-list">
+                <li>选手应确保报名信息真实可靠，不得弄虚作假，参赛队伍自行设置的队名不得出现有违公序良俗的字样；参赛内容须遵从国家法律法规及政策要求。</li>
+                <li>所有参赛作品应独立设计、开发和完成，严禁抄袭、剽窃、侵犯他人知识产权等行为；已在其他赛事参赛并获奖的作品不得重复参赛。</li>
+                <li>其他约定详见
+                    <a href="#" class="link" target="_blank" rel="noopener noreferrer">报名须知</a>
+                    。
+                </li>
+            </ol>
+            <p class="tip">报名成功后可扫码添加小助手，获取赛事一手资讯，加入赛道专属交流群。</p>
+        </section>
+
+        <form id="team-form" class="form">
+            <!-- 团队信息 -->
+            <section class="form-section">
+                <h2>团队信息</h2>
+                
+                <div class="form-group">
+                    <label for="team-name" class="required">团队名称</label>
+                    <input type="text" id="team-name" name="team_name" required
+                           placeholder="请输入团队名称（20字内）" maxlength="20">
+                    <span class="error-message" id="team-name-error"></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="competition-track" class="required">参赛赛道</label>
+                    <select id="competition-track" name="competition_track" required>
+                        <option value="">请选择参赛赛道</option>
+                        <option value="技术挑战赛">技术挑战赛</option>
+                        <option value="创新应用赛">创新应用赛</option>
+                    </select>
+                    <span class="error-message" id="competition-track-error"></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="project-name" class="required">作品名称</label>
+                    <input type="text" id="project-name" name="project_name" required
+                           placeholder="请输入作品名称（20字内）" maxlength="20">
+                    <span class="error-message" id="project-name-error"></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="repo-url">代码仓库链接</label>
+                    <input type="url" id="repo-url" name="repo_url"
+                           placeholder="GitHub仓库链接，可在提交作品后公开该仓库" maxlength="255">
+                </div>
+
+                <div class="form-group">
+                    <label for="costrict-uid" class="required">CoStrict 用户ID</label>
+                    <input type="text" id="costrict-uid" name="costrict_uid" required
+                           placeholder="用于接收Credits，插件端点击“查看账户详情”可复制【非常重要】" maxlength="50">
+                    <span class="error-message" id="costrict-uid-error"></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="project-intro">项目简介（200-500字）</label>
+                    <div class="field-description">
+                        <p>a. 清晰描述你们的项目是什么。</p>
+                        <p>b. 它为目标用户提供了什么价值？</p>
+                        <p>c. 创新点或与众不同之处在哪里？</p>
+                    </div>
+                    <textarea id="project-intro" name="project_intro" rows="4"
+                              placeholder="请输入项目简介" minlength="200" maxlength="500"></textarea>
+                    <span class="error-message" id="project-intro-error"></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="tech-solution">技术方案（200-500字）</label>
+                    <div class="field-description">
+                        <p>a. 计划使用的主要技术栈 (前端、后端、数据库、第三方API/服务等)。</p>
+                        <p>b. 系统架构的简要描述 (可以文字或图示)。</p>
+                        <p>c. 预期的实现难点和解决方案。</p>
+                    </div>
+                    <textarea id="tech-solution" name="tech_solution" rows="4"
+                              placeholder="请输入技术方案" minlength="200" maxlength="500"></textarea>
+                    <span class="error-message" id="tech-solution-error"></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="goals-outlook">目标与展望（200-500字）</label>
+                    <div class="field-description">
+                        <p>a. 在比赛期间，你们计划完成一个什么样的最小可行产品(MVP)？</p>
+                        <p>b. 项目的长期发展潜力是什么？</p>
+                    </div>
+                    <textarea id="goals-outlook" name="goals_and_outlook" rows="4"
+                              placeholder="请输入目标与展望" minlength="200" maxlength="500"></textarea>
+                    <span class="error-message" id="goals-outlook-error"></span>
+                </div>
+            </section>
+
+            <!-- 团队成员 -->
+            <section class="form-section">
+                <h2>团队成员</h2>
+                <div id="members-container">
+                    <!-- 默认第一个成员 -->
+                    <div class="member-item" data-member-index="0">
+                        <div class="member-header">
+                            <h3>成员 1 <button type="button" class="toggle-btn" data-index="0">展开</button> <span class="member-name-display" id="member-name-display-0"></span></h3>
+                            <div class="member-actions">
+                                <div class="member-captain captain-selected">
+                                    <label>
+                                        <input type="checkbox" name="member_captain_0" class="captain-checkbox" checked> 队长
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="member-content" id="member-content-0">
+                        
+                        <div class="form-group">
+                            <label for="member-name-0" class="required">姓名</label>
+                            <input type="text" id="member-name-0" name="member_name_0" required
+                                   placeholder="请输入姓名">
+                            <span class="error-message" id="member-name-0-error"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="member-school-0" class="required">学校/单位</label>
+                            <input type="text" id="member-school-0" name="member_school_0" required
+                                   placeholder="请输入学校或单位名称">
+                            <span class="error-message" id="member-school-0-error"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="member-department-0" class="required">学院/系别</label>
+                            <input type="text" id="member-department-0" name="member_department_0" required
+                                   placeholder="请输入学院或系别">
+                            <span class="error-message" id="member-department-0-error"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="member-major-grade-0" class="required">专业与年级</label>
+                            <input type="text" id="member-major-grade-0" name="member_major_grade_0" required
+                                   placeholder="例如：计算机科学 大三">
+                            <span class="error-message" id="member-major-grade-0-error"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="member-phone-0" class="required">联系电话</label>
+                            <input type="tel" id="member-phone-0" name="member_phone_0" required
+                                   placeholder="请输入11位手机号" pattern="[0-9]{11}">
+                            <span class="error-message" id="member-phone-0-error"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="member-email-0" class="required">电子邮箱</label>
+                            <input type="email" id="member-email-0" name="member_email_0" required
+                                   placeholder="example@email.com">
+                            <span class="error-message" id="member-email-0-error"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="member-student-id-0">学号（可选）</label>
+                            <input type="text" id="member-student-id-0" name="member_student_id_0"
+                                   placeholder="用于身份验证，可选">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="member-role-0" class="required">项目角色</label>
+                            <input type="text" id="member-role-0" name="member_role_0" required
+                                   placeholder="例如：前端开发、后端开发、算法、UI/UX设计、产品经理等">
+                            <span class="error-message" id="member-role-0-error"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="member-tech-stack-0">技术栈/擅长领域</label>
+                            <input type="text" id="member-tech-stack-0" name="member_tech_stack_0"
+                                   placeholder="例如：Python, React, Node.js, TensorFlow, Figma">
+                        </div>
+                    </div>
+                    </div>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="button" id="add-member-btn" class="secondary-btn">
+                        <span class="btn-text">+ 添加成员</span>
+                    </button>
+                </div>
+            </section>
+
+            <!-- 提交按钮 -->
+            <div class="agree">
+                <label class="checkbox">
+                    <input type="checkbox" id="agree" name="agree"> 我已阅读并同意
+                    <a href="#" class="link" target="_blank" rel="noopener noreferrer">报名须知</a>
+                </label>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" id="submit-btn" class="submit-btn">
+                    <span class="btn-text">提交</span>
+                    <span class="btn-loader" style="display: none;">提交中...</span>
+                </button>
+            </div>
+        </form>
+
+        <!-- 提交成功提示 -->
+        <div id="success-message" class="success-message" style="display: none;">
+            <div class="success-content">
+                <svg class="success-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+                <h3>报名成功！</h3>
+                <p>您已成功报名参加"码上AI·2025深信服CoStrict校园挑战赛"。我们已向您的邮箱发送确认邮件，请查收。</p>
+                <p>比赛相关信息将通过邮件通知您，请保持联系方式畅通。</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 联系我们 -->
+    <footer class="contact-footer">
+        <div class="container">
+            <h3>联系我们</h3>
+            <div class="contact-info">
+                <p>邮箱：zgsm@sangfor.com.cn</p>
+                <p>扫码添加下方小助手微信，备注"大赛"进群</p>
+                <div class="qr-code-container">
+                    <img src="qr_code.png" alt="小助手微信二维码" class="qr-code">
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Toast 容器：无依赖通知 -->
+    <div id="toast-container" class="toast-container" aria-live="polite" aria-atomic="true"></div>
+
+    <script src="script.js"></script>
+</body>
+</html>
+
