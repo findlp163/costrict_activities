@@ -27,4 +27,4 @@ COPY . .
 EXPOSE 5000
 
 # 设置入口点命令 - 使用生产级WSGI服务器
-CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--workers", "2", "--timeout", "120", "--keepalive", "5", "--max-requests", "1000", "--max-requests-jitter", "50", "wsgi:application"]
+CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--workers", "2", "--timeout", "120", "--keep-alive", "5", "--max-requests", "1000", "--max-requests-jitter", "50", "wsgi:application"]
