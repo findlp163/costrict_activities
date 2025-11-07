@@ -5,21 +5,55 @@ Flask-Admin配置文件
 
 from flask_admin import Admin, AdminIndexView, expose
 from flask_admin.contrib.sqla import ModelView
+from flask_admin.base import MenuLink
 from flask import redirect, url_for, request, abort, Response
+import os
 from models import db, Team, TeamMember
 
 
-class MyAdminIndexView(AdminIndexView):
+class AuthMixin:
     """
-    自定义管理界面首页视图
+    认证混入类，用于统一管理Flask-Admin视图的认证逻辑
     """
+    def is_accessible(self):
+        # 简单的HTTP基本认证
+        auth = request.authorization
+        if not auth or not self.check_auth(auth.username, auth.password):
+            return False
+        return True
+    
+    def check_auth(self, username, password):
+        # 从环境变量获取用户名和密码，如果环境变量不存在则使用默认值
+        admin_username = os.getenv('ADMIN_USERNAME', 'admin')
+        admin_password = os.getenv('ADMIN_PASSWORD', 'admin')
+        return username == admin_username and password == admin_password
+    
+    def inaccessible_callback(self, name, **kwargs):
+        # 返回401未授权响应，触发浏览器显示基本认证对话框
+        return Response(
+            '请提供有效的管理员凭据',
+            401,
+            {'WWW-Authenticate': 'Basic realm="Login Required"'}
+        )
+
+
+class MyAdminIndexView(AuthMixin, AdminIndexView):
+    """
+    自定义管理界面首页视图，添加基本认证
+    """
+    
     @expose('/')
     def index(self):
         # 这里可以添加自定义的首页逻辑
         return super(MyAdminIndexView, self).index()
+    
+    @expose('/logout')
+    def logout(self):
+        # 简单重定向到首页
+        return redirect('/')
 
 
-class TeamView(ModelView):
+class TeamView(AuthMixin, ModelView):
     """
     团队模型的管理视图 - 简化配置，显示所有字段
     """
@@ -62,7 +96,7 @@ class TeamView(ModelView):
     }
 
 
-class TeamMemberView(ModelView):
+class TeamMemberView(AuthMixin, ModelView):
     """
     团队成员模型的管理视图 - 简化配置，显示所有字段
     """
@@ -135,4 +169,8 @@ def setup_admin(app):
     admin.add_view(TeamView(Team, db.session, name='团队管理', url='/admin/team'))
     admin.add_view(TeamMemberView(TeamMember, db.session, name='成员管理', url='/admin/member'))
     
+    # 添加自定义模板目录，这样我们可以覆盖默认模板
+    admin.add_link(MenuLink(name='退出登录', url='/admin/logout', category=None))
+    
     return admin
+

@@ -13,6 +13,8 @@ services:
       - FLASK_ENV=production
       - DATABASE_URL=sqlite:///users.db
       - PYTHONOPTIMIZE=2
+      - ADMIN_USERNAME=admin
+      - ADMIN_PASSWORD=admin
     restart: unless-stopped
     deploy:
       resources:

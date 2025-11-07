@@ -7,7 +7,7 @@
 
 body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    background: #f5f6f7; /* 更贴近 InfoQ 的浅灰背景 */
+    background: #f7fbfd; /* 使用浅蓝色背景，更贴近深信服色调 */
     min-height: 100vh;
     padding: 24px;
     line-height: 1.6;
@@ -61,7 +61,7 @@ body {
 
 .notice-list li + li { margin-top: 8px; }
 
-.intro .link { color: #1277eb; text-decoration: none; }
+.intro .link { color: #45afd5; text-decoration: none; }
 .intro .link:hover { text-decoration: underline; }
 
 .tip { color: #6b7280; font-size: 13px; margin-top: 12px; }
@@ -136,8 +136,8 @@ body {
 }
 
 .field-description {
-    background: #f8f9fa;
-    border-left: 3px solid #1277eb;
+    background: #f7fbfd;
+    border-left: 3px solid #45afd5;
     padding: 10px 12px;
     margin-bottom: 10px;
     border-radius: 0 4px 4px 0;
@@ -176,8 +176,8 @@ body {
 .form-group select:focus,
 .form-group textarea:focus {
     outline: none;
-    border-color: #1277eb; /* 蓝色主色 */
-    box-shadow: 0 0 0 3px rgba(18, 119, 235, 0.12);
+    border-color: #45afd5; /* 深信服蓝色主色 */
+    box-shadow: 0 0 0 3px rgba(69, 175, 213, 0.15);
 }
 
 .form-group input:invalid:not(:placeholder-shown),
@@ -206,9 +206,9 @@ body {
 }
 
 .submit-btn {
-    background: #1277eb;
+    background: #45afd5;
     color: #fff;
-    border: 1px solid #1168cc;
+    border: 1px solid #3a9fc0;
     padding: 10px 20px;
     font-size: 14px;
     border-radius: 4px;
@@ -219,8 +219,8 @@ body {
 }
 
 .submit-btn:hover:not(:disabled) {
-    background: #0f6ad3;
-    box-shadow: 0 2px 8px rgba(17, 104, 204, 0.24);
+    background: #3a9fc0;
+    box-shadow: 0 2px 8px rgba(69, 175, 213, 0.30);
 }
 
 .submit-btn:active:not(:disabled) {
@@ -261,7 +261,7 @@ body {
 }
 
 .checkbox .link {
-    color: #1277eb;
+    color: #45afd5;
     text-decoration: none;
     margin-left: 4px;
 }
@@ -410,7 +410,7 @@ body {
     padding: 2px;
 }
 
-.toast-info { border-left-color: #3b82f6; }
+.toast-info { border-left-color: #5cbbdb; }
 .toast-success { border-left-color: #22c55e; }
 .toast-error { border-left-color: #ef4444; }
 
@@ -437,7 +437,7 @@ body {
     border-radius: 8px;
     padding: 20px;
     margin-bottom: 20px;
-    background-color: #fafafa;
+    background-color: #f0f7fa;
     position: relative;
 }
 
@@ -475,9 +475,9 @@ body {
 }
 
 .member-captain.captain-selected {
-    background-color: #dcfce7;
-    border: 1px solid #86efac;
-    color: #15803d;
+    background-color: #e6f7fa;
+    border: 1px solid #5cbbdb;
+    color: #2a8ca5;
     font-weight: 600;
 }
 
@@ -501,7 +501,7 @@ body {
 }
 
 .secondary-btn {
-    background: #6b7280;
+    background: #68c2db;
     color: #fff;
     border: none;
     padding: 8px 16px;
@@ -518,9 +518,9 @@ body {
 }
 
 .toggle-btn {
-    background: #f3f4f6;
-    color: #374151;
-    border: 1px solid #d1d5db;
+    background: #e6f7fa;
+    color: #2a8ca5;
+    border: 1px solid #a3ddeb;
     padding: 2px 6px;
     border-radius: 4px;
     font-size: 0.7rem;
@@ -532,8 +532,8 @@ body {
 }
 
 .toggle-btn:hover {
-    background: #e5e7eb;
-    border-color: #9ca3af;
+    background: #d0edf7;
+    border-color: #5cbbdb;
 }
 
 .member-header h3 .toggle-btn {
@@ -554,7 +554,7 @@ body {
 }
 
 .secondary-btn:hover {
-    background: #4b5563;
+    background: #5cbbdb;
 }
 
 /* 文本框样式调整 */
@@ -566,11 +566,11 @@ body {
 
 /* 联系我们页脚 */
 .contact-footer {
-    background: #fff;
-    border-top: 1px solid #e5e7eb;
+    background: #f0f7fa;
+    border-top: 1px solid #d0edf7;
     margin-top: 32px;
     padding: 24px 0;
-    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.04);
+    box-shadow: 0 -2px 8px rgba(69, 175, 213, 0.08);
 }
 
 .contact-footer h3 {
