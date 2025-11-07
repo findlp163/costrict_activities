@@ -51,6 +51,25 @@
                 </div>
 
                 <div class="form-group">
+                    <label for="repo-url">代码仓库链接</label>
+                    <div class="field-description">
+                        <p>你的GitHub仓库链接，请保持私密，直到提交作品后公开该仓库。参考<a href="https://docs.github.com/zh/repositories/creating-and-managing-repositories/quickstart-for-repositories" class="link" target="_blank" rel="noopener noreferrer">GitHub仓库快速入门</a></p>
+                    </div>
+                    <input type="url" id="repo-url" name="repo_url"
+                           placeholder="GitHub仓库链接，请在提交作品后公开该仓库" maxlength="255">
+                </div>
+
+                <div class="form-group">
+                    <label for="costrict-uid" class="required">CoStrict 用户ID</label>
+                    <div class="field-description">
+                        <p>用于接收比赛所需的Credits，点击登录CoStrict账户<a href="https://zgsm.sangfor.com/credit/manager/login" class="link" target="_blank" rel="noopener noreferrer">https://zgsm.sangfor.com/credit/manager/login</a>查看并复制到下方表单。</p>
+                    </div>
+                    <input type="text" id="costrict-uid" name="costrict_uid" required
+                           placeholder="请复制您的CoStrict用户ID" maxlength="50">
+                    <span class="error-message" id="costrict-uid-error"></span>
+                </div>
+
+                <div class="form-group">
                     <label for="project-name" class="required">作品名称</label>
                     <input type="text" id="project-name" name="project_name" required
                            placeholder="请输入作品名称（20字内）" maxlength="20">
@@ -58,38 +77,25 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="repo-url">代码仓库链接</label>
-                    <input type="url" id="repo-url" name="repo_url"
-                           placeholder="GitHub仓库链接，可在提交作品后公开该仓库" maxlength="255">
-                </div>
-
-                <div class="form-group">
-                    <label for="costrict-uid" class="required">CoStrict 用户ID</label>
-                    <input type="text" id="costrict-uid" name="costrict_uid" required
-                           placeholder="用于接收Credits，插件端点击“查看账户详情”可复制【非常重要】" maxlength="50">
-                    <span class="error-message" id="costrict-uid-error"></span>
-                </div>
-
-                <div class="form-group">
-                    <label for="project-intro">项目简介（200-500字）</label>
+                    <label for="project-intro" class="required">项目简介（200-500字）</label>
                     <div class="field-description">
                         <p>a. 清晰描述你们的项目是什么。</p>
                         <p>b. 它为目标用户提供了什么价值？</p>
                         <p>c. 创新点或与众不同之处在哪里？</p>
                     </div>
-                    <textarea id="project-intro" name="project_intro" rows="4"
+                    <textarea id="project-intro" name="project_intro" rows="4" required
                               placeholder="请输入项目简介" minlength="200" maxlength="500"></textarea>
                     <span class="error-message" id="project-intro-error"></span>
                 </div>
 
                 <div class="form-group">
-                    <label for="tech-solution">技术方案（200-500字）</label>
+                    <label for="tech-solution" class="required">技术方案（200-500字）</label>
                     <div class="field-description">
                         <p>a. 计划使用的主要技术栈 (前端、后端、数据库、第三方API/服务等)。</p>
                         <p>b. 系统架构的简要描述 (可以文字或图示)。</p>
                         <p>c. 预期的实现难点和解决方案。</p>
                     </div>
-                    <textarea id="tech-solution" name="tech_solution" rows="4"
+                    <textarea id="tech-solution" name="tech_solution" rows="4" required
                               placeholder="请输入技术方案" minlength="200" maxlength="500"></textarea>
                     <span class="error-message" id="tech-solution-error"></span>
                 </div>

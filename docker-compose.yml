@@ -1,9 +1,9 @@
 version: '3.8'
 
 services:
-  web:
+  costrict_competition_form:
     build: .
-    container_name: team_registration_app
+    container_name: costrict_competition_form
     ports:
       - "5000:5000"
     volumes:

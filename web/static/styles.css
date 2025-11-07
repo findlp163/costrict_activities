@@ -578,6 +578,11 @@ body {
     color: #111827;
     margin-bottom: 12px;
     font-weight: 600;
+    text-align: center;
+}
+
+.contact-info {
+    text-align: center;
 }
 
 .contact-info p {
@@ -593,7 +598,7 @@ body {
 
 .qr-code-container {
     margin-top: 12px;
-    text-align: left;
+    text-align: center;
 }
 
 .qr-code {
