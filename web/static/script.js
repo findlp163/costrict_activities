@@ -645,9 +645,36 @@ if (initialCaptainCheckbox) {
     }
 }
 
+// 获取并显示报名截止时间
+async function fetchAndDisplayDeadline() {
+    try {
+        const response = await fetch('/api/config?config_key=DEADLINE');
+        
+        if (response.ok) {
+            const result = await response.json();
+            if (result.success && result.data) {
+                const deadlineElement = document.getElementById('deadline-time');
+                const deadlineNotice = document.getElementById('deadline-notice');
+                
+                if (deadlineElement && deadlineNotice) {
+                    deadlineElement.textContent = result.data.value;
+                    deadlineNotice.style.display = 'block';
+                }
+            }
+        } else {
+            console.log('未设置截止时间或获取失败');
+        }
+    } catch (error) {
+        console.error('获取截止时间失败:', error);
+    }
+}
+
 // 页面加载完成后的初始化
 document.addEventListener('DOMContentLoaded', function() {
     console.log('团队表单页面已加载');
+    
+    // 获取并显示截止时间
+    fetchAndDisplayDeadline();
     
     // 初始化成员折叠/展开功能
     const toggleBtns = document.querySelectorAll('.toggle-btn');

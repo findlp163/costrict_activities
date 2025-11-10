@@ -8,7 +8,7 @@ from flask_admin.contrib.sqla import ModelView
 from flask_admin.base import MenuLink
 from flask import redirect, url_for, request, abort, Response
 import os
-from models import db, Team, TeamMember
+from models import db, Team, TeamMember, Config
 
 
 class AuthMixin:
@@ -154,6 +154,59 @@ class TeamMemberView(AuthMixin, ModelView):
     }
 
 
+class ConfigView(AuthMixin, ModelView):
+    """
+    配置模型的管理视图 - 用于管理系统配置
+    """
+    # 启用列表页面的详情查看功能
+    can_view_details = True
+    
+    # 启用导出功能
+    can_export = True
+    
+    def on_model_change(self, form, model, is_created):
+        """在模型保存前调用，自动更新时间戳"""
+        if not is_created:
+            # 更新现有记录时，手动更新时间戳
+            model.update_timestamps()
+        return super(ConfigView, self).on_model_change(form, model, is_created)
+    
+    # 指定列表页面显示的字段
+    column_list = ('id', 'config_key', 'config_value', 'config_type', 'description', 'createdAt', 'updatedAt')
+    
+    # 指定表单中显示的字段
+    form_columns = ('config_key', 'config_value', 'config_type', 'description')
+    
+    # 指定详情页面显示的字段
+    column_details_list = ('id', 'config_key', 'config_value', 'config_type', 'description', 'createdAt', 'updatedAt')
+    
+    # 定义搜索字段
+    column_searchable_list = ('config_key', 'config_value', 'description')
+    
+    # 定义过滤器
+    column_filters = ('config_key', 'config_type', 'createdAt', 'updatedAt')
+    
+    # 自定义显示名称 - 中文字段标题
+    column_labels = {
+        'id': 'ID',
+        'config_key': '配置键',
+        'config_value': '配置值',
+        'config_type': '配置类型',
+        'description': '描述',
+        'createdAt': '创建时间',
+        'updatedAt': '更新时间'
+    }
+    
+    # 为配置类型提供选择器
+    form_choices = {
+        'config_type': [
+            ('str', '字符串'),
+            ('int', '整数'),
+            ('datetime', '日期时间')
+        ]
+    }
+
+
 # 创建Admin实例的函数
 def setup_admin(app):
     """
@@ -168,9 +221,11 @@ def setup_admin(app):
     # 添加模型视图
     admin.add_view(TeamView(Team, db.session, name='团队管理', url='/admin/team'))
     admin.add_view(TeamMemberView(TeamMember, db.session, name='成员管理', url='/admin/member'))
+    admin.add_view(ConfigView(Config, db.session, name='系统配置', url='/admin/config'))
     
     # 添加自定义模板目录，这样我们可以覆盖默认模板
     admin.add_link(MenuLink(name='退出登录', url='/admin/logout', category=None))
     
     return admin
+
 

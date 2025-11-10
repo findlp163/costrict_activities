@@ -77,3 +77,35 @@ class TeamMember(db.Model):
     # 项目角色
     role = db.Column(db.String(100), nullable=False)  # 项目角色
     tech_stack = db.Column(db.String(500))  # 技术栈/擅长领域
+
+
+class Config(db.Model):
+    """
+    系统配置表 - 简单的key-value键值对存储
+    用于存储系统全局配置信息
+    """
+    __tablename__ = 'configs'
+    
+    # 自增整型主键
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    createdAt = db.Column(db.DateTime, nullable=False, default=get_current_time)
+    updatedAt = db.Column(db.DateTime, nullable=False, default=get_current_time)
+    
+    def __init__(self, **kwargs):
+        super(Config, self).__init__(**kwargs)
+        self.updatedAt = get_current_time()
+    
+    def update_timestamps(self):
+        self.updatedAt = get_current_time()
+    
+    # 配置键 - 唯一索引
+    config_key = db.Column(db.String(100), nullable=False, unique=True, index=True)
+    
+    # 配置值
+    config_value = db.Column(db.Text, nullable=True)
+    
+    # 配置类型 - 支持int、datetime、str，默认为str
+    config_type = db.Column(db.Enum('str', 'int', 'datetime', name='config_type_enum'), nullable=False, default='str')
+    
+    # 配置描述
+    description = db.Column(db.String(255), nullable=True)

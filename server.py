@@ -22,7 +22,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = 'my-secret-key'  # 用于session和CSRF保护
 
 # 导入数据模型和数据库实例
-from models import db, Team, TeamMember
+from models import db, Team, TeamMember, Config
 db.init_app(app)
 # 导入并设置Flask-Admin
 from admin import setup_admin
@@ -98,84 +98,51 @@ def save_team(team_data, members_data):
         existing_team = Team.query.filter_by(team_name=team_data.get('team_name', '')).first()
         
         if existing_team:
-            # 更新现有团队信息
-            existing_team.updatedAt = now_dt
-            existing_team.competition_track = team_data.get('competition_track', '')
-            existing_team.project_name = team_data.get('project_name', '')
-            existing_team.repo_url = team_data.get('repo_url', '')
-            existing_team.costrict_uid = team_data.get('costrict_uid', '')
-            existing_team.project_intro = team_data.get('project_intro', '')
-            existing_team.tech_solution = team_data.get('tech_solution', '')
-            existing_team.goals_and_outlook = team_data.get('goals_and_outlook', '')
-            
-            # 删除现有成员（级联删除）
-            TeamMember.query.filter_by(team_id=existing_team.id).delete()
-            
-            # 添加新成员
-            for member_data in members_data:
-                member = TeamMember(
-                    team_id=existing_team.id,
-                    team_name=team_data.get('team_name', ''),
-                    name=member_data.get('name', ''),
-                    is_captain=member_data.get('is_captain', False),
-                    school=member_data.get('school', ''),
-                    department=member_data.get('department', ''),
-                    major_grade=member_data.get('major_grade', ''),
-                    phone=member_data.get('phone', ''),
-                    email=member_data.get('email', ''),
-                    student_id=member_data.get('student_id', ''),
-                    role=member_data.get('role', ''),
-                    tech_stack=member_data.get('tech_stack', ''),
-                    createdAt=now_dt,
-                    updatedAt=now_dt
-                )
-                db.session.add(member)
-            
-            db.session.commit()
-            return True, existing_team.id
-        else:
-            # 创建新团队
-            new_team = Team(
+            # 团队名已存在，返回错误
+            return False, "团队名称已存在，请使用其他名称"
+        
+        # 创建新团队
+        new_team = Team(
+            team_name=team_data.get('team_name', ''),
+            competition_track=team_data.get('competition_track', ''),
+            project_name=team_data.get('project_name', ''),
+            repo_url=team_data.get('repo_url', ''),
+            costrict_uid=team_data.get('costrict_uid', ''),
+            project_intro=team_data.get('project_intro', ''),
+            tech_solution=team_data.get('tech_solution', ''),
+            goals_and_outlook=team_data.get('goals_and_outlook', ''),
+            createdAt=now_dt,
+            updatedAt=now_dt
+        )
+        db.session.add(new_team)
+        db.session.flush()  # 获取新团队ID
+        
+        # 添加团队成员
+        for member_data in members_data:
+            member = TeamMember(
+                team_id=new_team.id,
                 team_name=team_data.get('team_name', ''),
-                competition_track=team_data.get('competition_track', ''),
-                project_name=team_data.get('project_name', ''),
-                repo_url=team_data.get('repo_url', ''),
-                costrict_uid=team_data.get('costrict_uid', ''),
-                project_intro=team_data.get('project_intro', ''),
-                tech_solution=team_data.get('tech_solution', ''),
-                goals_and_outlook=team_data.get('goals_and_outlook', ''),
+                name=member_data.get('name', ''),
+                is_captain=member_data.get('is_captain', False),
+                school=member_data.get('school', ''),
+                department=member_data.get('department', ''),
+                major_grade=member_data.get('major_grade', ''),
+                phone=member_data.get('phone', ''),
+                email=member_data.get('email', ''),
+                student_id=member_data.get('student_id', ''),
+                role=member_data.get('role', ''),
+                tech_stack=member_data.get('tech_stack', ''),
                 createdAt=now_dt,
                 updatedAt=now_dt
             )
-            db.session.add(new_team)
-            db.session.flush()  # 获取新团队ID
-            
-            # 添加团队成员
-            for member_data in members_data:
-                member = TeamMember(
-                    team_id=new_team.id,
-                    team_name=team_data.get('team_name', ''),
-                    name=member_data.get('name', ''),
-                    is_captain=member_data.get('is_captain', False),
-                    school=member_data.get('school', ''),
-                    department=member_data.get('department', ''),
-                    major_grade=member_data.get('major_grade', ''),
-                    phone=member_data.get('phone', ''),
-                    email=member_data.get('email', ''),
-                    student_id=member_data.get('student_id', ''),
-                    role=member_data.get('role', ''),
-                    tech_stack=member_data.get('tech_stack', ''),
-                    createdAt=now_dt,
-                    updatedAt=now_dt
-                )
-                db.session.add(member)
-            
-            db.session.commit()
-            return True, new_team.id
+            db.session.add(member)
+        
+        db.session.commit()
+        return True, new_team.id
     except Exception as e:
         db.session.rollback()
         print(f'保存团队数据失败: {e}')
-        return False, None
+        return False, f'保存团队数据失败: {str(e)}'
 
 @app.route('/')
 def index():
@@ -191,6 +158,30 @@ def static_files(path):
 def submit_team():
     """处理团队信息和成员提交"""
     try:
+        # 首先检查报名截止时间
+        deadline_config = get_config_by_key('DEADLINE')
+        if deadline_config and deadline_config['type'] == 'datetime':
+            # 获取当前时间（上海时区）
+            shanghai_tz = pytz.timezone('Asia/Shanghai')
+            current_time = datetime.now(shanghai_tz)
+            
+            # 解析截止时间（get_config_by_key已经对时间类型做了转换）
+            try:
+                deadline_str = deadline_config['value']
+                deadline_dt = datetime.strptime(deadline_str, '%Y-%m-%d %H:%M:%S')
+                # 设置为上海时区
+                deadline_dt = shanghai_tz.localize(deadline_dt)
+                
+                # 比较时间
+                if current_time > deadline_dt:
+                    return jsonify({
+                        'success': False,
+                        'message': f'报名已截止，截止时间为：{deadline_str}'
+                    }), 403
+            except ValueError as e:
+                print(f'解析截止时间失败: {e}')
+                # 如果解析失败，允许继续提交（避免因配置错误导致系统无法使用）
+        
         data = request.get_json() or {}
         print(f'收到团队提交: {data}')
 
@@ -289,19 +280,19 @@ def submit_team():
             'goals_and_outlook': goals_and_outlook
         }
         
-        success, team_id = save_team(team_data, members_info)
+        success, result = save_team(team_data, members_info)
         
         if success:
             return jsonify({
                 'success': True,
                 'message': '您已成功报名参加"码上AI·2025深信服CoStrict校园挑战赛"。我们已向您的邮箱发送确认邮件，请查收。',
-                'team_id': team_id
+                'team_id': result
             })
         else:
             return jsonify({
                 'success': False,
-                'message': '服务器错误，请稍后重试'
-            }), 500
+                'message': result
+            }), 400
 
     except Exception as e:
         print(f'处理团队提交错误: {e}')
@@ -372,6 +363,72 @@ def get_team(team_id):
             'success': False,
             'message': '服务器错误'
         }), 500
+
+def get_config_by_key(config_key):
+    """
+    根据配置键查询配置的最新记录，并根据类型返回对应格式的值
+    
+    Args:
+        config_key (str): 配置键
+        
+    Returns:
+        dict: 包含配置信息的字典，如果不存在则返回None
+    """
+    try:
+        config = Config.query.filter_by(config_key=config_key).order_by(Config.updatedAt.desc()).first()
+        if config:
+            # 根据配置类型转换值
+            value = config.config_value
+            if config.config_type == 'int':
+                try:
+                    value = int(value)
+                except (ValueError, TypeError):
+                    print(f'配置键 {config_key} 的值无法转换为整数，保持原字符串')
+            elif config.config_type == 'datetime':
+                try:
+                    # 尝试解析日期时间字符串并转换为标准格式
+                    from datetime import datetime
+                    dt = datetime.fromisoformat(value) if value else None
+                    value = dt.strftime('%Y-%m-%d %H:%M:%S') if dt else value
+                except (ValueError, TypeError):
+                    print(f'配置键 {config_key} 的值无法转换为日期时间，保持原字符串')
+            
+            return {
+                'key': config.config_key,
+                'value': value,
+                'type': config.config_type,
+                'description': config.description
+            }
+        return None
+    except Exception as e:
+        print(f'查询配置错误: {e}')
+        return None
+
+@app.route('/api/config', methods=['GET'])
+def get_config():
+    """根据config_key查询配置项 - 供前端使用"""
+    # 获取查询参数中的key
+    config_key = request.args.get('config_key')
+    
+    if not config_key:
+        return jsonify({
+            'success': False,
+            'message': '请提供配置键(key)参数'
+        }), 400
+    
+    # 使用封装的查询函数
+    result = get_config_by_key(config_key)
+    
+    if not result:
+        return jsonify({
+            'success': False,
+            'message': '配置项不存在'
+        }), 404
+    
+    return jsonify({
+        'success': True,
+        'data': result
+    })
 
 if __name__ == '__main__':
     print('服务器启动中...')
