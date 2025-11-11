@@ -340,6 +340,11 @@ body {
         width: 100%;
         padding: 12px;
     }
+    
+    /* 移动端头图优化 */
+    .hero-banner img {
+        height: 250px; /* 移动端降低高度 */
+    }
 }
 
 @media (max-width: 480px) {
