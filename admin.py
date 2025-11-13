@@ -62,6 +62,7 @@ class TeamView(AuthMixin, ModelView):
     
     # 启用导出功能
     can_export = True
+    export_max_rows = 0  # 0=不限制，默认 1000
     
     # 每页显示的记录数
     page_size = 20
@@ -74,8 +75,13 @@ class TeamView(AuthMixin, ModelView):
         return super(TeamView, self).on_model_change(form, model, is_created)
     
     # 指定列表页面显示的字段
-    column_list = ('id', 'createdAt', 'updatedAt', 'team_name', 'competition_track', 
+    column_list = ('id', 'createdAt', 'updatedAt', 'team_name', 'competition_track',
                   'project_name', 'repo_url', 'costrict_uid')
+    
+    # 指定导出时包含的字段（所有字段）
+    column_export_list = ('id', 'createdAt', 'updatedAt', 'team_name', 'competition_track',
+                   'project_name', 'repo_url', 'costrict_uid', 'project_intro',
+                   'tech_solution', 'goals_and_outlook')
     
     # 定义搜索字段
     column_searchable_list = ('team_name', 'project_name', 'competition_track')
@@ -108,6 +114,7 @@ class TeamMemberView(AuthMixin, ModelView):
     
     # 启用导出功能
     can_export = True
+    export_max_rows = 0  # 0=不限制，默认 1000
     
     # 每页显示的记录数
     page_size = 20
@@ -123,6 +130,11 @@ class TeamMemberView(AuthMixin, ModelView):
     column_list = ('id', 'team_id', 'team_name', 'name', 'member_type', 'school',
                   'department', 'major_grade', 'phone', 'email', 'student_id',
                   'role', 'tech_stack', 'createdAt', 'updatedAt')
+    
+    # 指定导出时包含的字段（所有字段）
+    column_export_list = ('id', 'team_id', 'team_name', 'name', 'member_type', 'school',
+                    'department', 'major_grade', 'phone', 'email', 'student_id',
+                    'role', 'tech_stack', 'desc', 'createdAt', 'updatedAt')
     
     # 指定表单中显示的字段
     form_columns = ('team_id', 'team_name', 'name', 'member_type', 'school',
@@ -177,8 +189,8 @@ class ConfigView(AuthMixin, ModelView):
     # 启用列表页面的详情查看功能
     can_view_details = True
     
-    # 启用导出功能
-    can_export = True
+    # 禁用导出功能
+    can_export = False
     
     # 每页显示的记录数
     page_size = 20
