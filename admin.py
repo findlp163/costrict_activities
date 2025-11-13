@@ -63,6 +63,9 @@ class TeamView(AuthMixin, ModelView):
     # 启用导出功能
     can_export = True
     
+    # 每页显示的记录数
+    page_size = 20
+    
     def on_model_change(self, form, model, is_created):
         """在模型保存前调用，自动更新时间戳"""
         if not is_created:
@@ -106,6 +109,9 @@ class TeamMemberView(AuthMixin, ModelView):
     # 启用导出功能
     can_export = True
     
+    # 每页显示的记录数
+    page_size = 20
+    
     def on_model_change(self, form, model, is_created):
         """在模型保存前调用，自动更新时间戳"""
         if not is_created:
@@ -114,25 +120,25 @@ class TeamMemberView(AuthMixin, ModelView):
         return super(TeamMemberView, self).on_model_change(form, model, is_created)
     
     # 指定列表页面显示的字段
-    column_list = ('id', 'team_id', 'team_name', 'name', 'is_captain', 'school',
+    column_list = ('id', 'team_id', 'team_name', 'name', 'member_type', 'school',
                   'department', 'major_grade', 'phone', 'email', 'student_id',
                   'role', 'tech_stack', 'createdAt', 'updatedAt')
     
     # 指定表单中显示的字段
-    form_columns = ('team_id', 'team_name', 'name', 'is_captain', 'school',
+    form_columns = ('team_id', 'team_name', 'name', 'member_type', 'school',
                    'department', 'major_grade', 'phone', 'email', 'student_id',
-                   'role', 'tech_stack')
+                   'role', 'tech_stack', 'desc')
     
     # 指定详情页面显示的字段
-    column_details_list = ('id', 'team_id', 'team_name', 'name', 'is_captain', 'school',
+    column_details_list = ('id', 'team_id', 'team_name', 'name', 'member_type', 'school',
                           'department', 'major_grade', 'phone', 'email', 'student_id',
-                          'role', 'tech_stack', 'createdAt', 'updatedAt')
+                          'role', 'tech_stack', 'desc', 'createdAt', 'updatedAt')
     
     # 定义搜索字段
     column_searchable_list = ('name', 'school', 'phone', 'email', 'team_name', 'tech_stack')
     
     # 定义过滤器
-    column_filters = ('is_captain', 'school', 'phone', 'email', 'team_name', 'tech_stack')
+    column_filters = ('member_type', 'school', 'phone', 'email', 'team_name', 'tech_stack')
     
     # 自定义显示名称 - 中文字段标题
     column_labels = {
@@ -140,7 +146,7 @@ class TeamMemberView(AuthMixin, ModelView):
         'team_id': '团队ID',
         'team_name': '团队名称',
         'name': '姓名',
-        'is_captain': '是否为队长',
+        'member_type': '成员类型',
         'school': '学校/单位',
         'department': '学院/系别',
         'major_grade': '专业与年级',
@@ -149,8 +155,18 @@ class TeamMemberView(AuthMixin, ModelView):
         'student_id': '学号',
         'role': '项目角色',
         'tech_stack': '技术栈/擅长领域',
+        'desc': '个人简介/备注',
         'createdAt': '创建时间',
         'updatedAt': '更新时间'
+    }
+    
+    # 为成员类型提供选择器
+    form_choices = {
+        'member_type': [
+            ('队员', '队员'),
+            ('队长', '队长'),
+            ('指导老师', '指导老师')
+        ]
     }
 
 
@@ -163,6 +179,9 @@ class ConfigView(AuthMixin, ModelView):
     
     # 启用导出功能
     can_export = True
+    
+    # 每页显示的记录数
+    page_size = 20
     
     def on_model_change(self, form, model, is_created):
         """在模型保存前调用，自动更新时间戳"""

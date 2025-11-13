@@ -70,7 +70,7 @@ def read_teams():
                 team_data['members'].append({
                     'id': member.id,
                     'name': member.name,
-                    'is_captain': member.is_captain,
+                    'member_type': member.member_type,
                     'school': member.school,
                     'department': member.department,
                     'major_grade': member.major_grade,
@@ -78,7 +78,8 @@ def read_teams():
                     'email': member.email,
                     'student_id': member.student_id or '',
                     'role': member.role,
-                    'tech_stack': member.tech_stack or ''
+                    'tech_stack': member.tech_stack or '',
+                    'desc': member.desc or ''
                 })
             
             result.append(team_data)
@@ -123,7 +124,7 @@ def save_team(team_data, members_data):
                 team_id=new_team.id,
                 team_name=team_data.get('team_name', ''),
                 name=member_data.get('name', ''),
-                is_captain=member_data.get('is_captain', False),
+                member_type=member_data.get('member_type', '队员'),
                 school=member_data.get('school', ''),
                 department=member_data.get('department', ''),
                 major_grade=member_data.get('major_grade', ''),
@@ -132,6 +133,7 @@ def save_team(team_data, members_data):
                 student_id=member_data.get('student_id', ''),
                 role=member_data.get('role', ''),
                 tech_stack=member_data.get('tech_stack', ''),
+                desc=member_data.get('desc', ''),
                 createdAt=now_dt,
                 updatedAt=now_dt
             )
@@ -228,12 +230,29 @@ def submit_team():
                 'message': '至少需要添加一名团队成员'
             }), 400
         
-        # 检查是否有队长
-        has_captain = any(member.get('is_captain', False) for member in members_info)
-        if not has_captain:
+        # 检查队长和指导老师数量
+        captain_count = sum(1 for member in members_info if member.get('member_type') == '队长')
+        teacher_count = sum(1 for member in members_info if member.get('member_type') == '指导老师')
+        
+        # 必须有一名队长
+        if captain_count == 0:
             return jsonify({
                 'success': False,
                 'message': '团队必须指定一名队长'
+            }), 400
+        
+        # 队长最多只能有一个
+        if captain_count > 1:
+            return jsonify({
+                'success': False,
+                'message': '一个团队只能有一名队长'
+            }), 400
+        
+        # 指导老师最多只能有一个（可选）
+        if teacher_count > 1:
+            return jsonify({
+                'success': False,
+                'message': '一个团队只能有一名指导老师'
             }), 400
         
         # 验证每个成员的必填字段
@@ -246,10 +265,11 @@ def submit_team():
             email = str(member.get('email', '')).strip()
             role = str(member.get('role', '')).strip()
             
-            if not all([name, school, department, major_grade, phone, email, role]):
+            # if not all([name, school, department, major_grade, phone, email, role]):
+            if not all([name, school, phone, email]):
                 return jsonify({
                     'success': False,
-                    'message': f'请填写成员{i+1}的所有必填字段（姓名、学校/单位、学院/系别、专业与年级、联系电话、电子邮箱、项目角色）'
+                    'message': f'请填写成员{i+1}的所有必填字段（姓名、学校/单位、联系电话、电子邮箱）'
                 }), 400
             
             # 验证邮箱格式
@@ -342,7 +362,7 @@ def get_team(team_id):
             team_data['members'].append({
                 'id': member.id,
                 'name': member.name,
-                'is_captain': member.is_captain,
+                'member_type': member.member_type,
                 'school': member.school,
                 'department': member.department,
                 'major_grade': member.major_grade,
@@ -350,7 +370,8 @@ def get_team(team_id):
                 'email': member.email,
                 'student_id': member.student_id or '',
                 'role': member.role,
-                'tech_stack': member.tech_stack or ''
+                'tech_stack': member.tech_stack or '',
+                'desc': member.desc or ''
             })
         
         return jsonify({

@@ -8,7 +8,12 @@ const toastContainer = document.getElementById('toast-container');
 const addMemberBtn = document.getElementById('add-member-btn');
 const membersContainer = document.getElementById('members-container');
 
+const addTeacherBtn = document.getElementById('add-teacher-btn');
+const advisorSection = document.getElementById('advisor-section');
+const advisorContainer = document.getElementById('advisor-container');
+
 let memberCount = 1; // 初始已有1个成员
+let advisorCount = 0; // 初始没有指导老师
 
 // 验证规则
 const validationRules = {
@@ -89,6 +94,36 @@ const memberValidationRules = {
     }
 };
 
+// 指导老师字段验证规则
+const advisorValidationRules = {
+    name: {
+        validate: (value) => value.trim().length >= 2,
+        message: '姓名至少需要2个字符'
+    },
+    phone: {
+        validate: (value) => {
+            const phoneRegex = /^1[3-9]\d{9}$/;
+            return phoneRegex.test(value);
+        },
+        message: '请输入有效的11位手机号'
+    },
+    email: {
+        validate: (value) => {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(value);
+        },
+        message: '请输入有效的邮箱地址'
+    },
+    school: {
+        validate: (value) => value.trim().length > 0,
+        message: '请填写学校'
+    },
+    department: {
+        validate: (value) => value.trim().length > 0,
+        message: '请填写学院'
+    }
+};
+
 // 实时验证
 function validateField(fieldName, value) {
     const rule = validationRules[fieldName];
@@ -128,6 +163,13 @@ function clearFieldError(fieldName) {
 
 // 添加新成员
 function addMember() {
+    // 检查成员数量限制
+    const currentMembers = document.querySelectorAll('.member-item').length;
+    if (currentMembers >= 5) {
+        showToast('最多只能添加5个成员', { type: 'error', title: '人数限制' });
+        return;
+    }
+    
     memberCount++;
     const memberIndex = memberCount - 1;
     
@@ -276,6 +318,139 @@ function addMember() {
     }
 }
 
+// 添加指导老师
+function addAdvisor() {
+    // 如果已经有指导老师，显示提示并返回
+    if (advisorCount >= 1) {
+        showToast('只能添加一位指导老师', { type: 'error', title: '操作限制' });
+        return;
+    }
+    
+    // 显示指导老师部分
+    advisorSection.style.display = 'block';
+    advisorCount++;
+    
+    const advisorIndex = 0; // 只能有一个指导老师，所以索引始终为0
+    
+    const advisorItem = document.createElement('div');
+    advisorItem.className = 'advisor-item';
+    advisorItem.setAttribute('data-advisor-index', advisorIndex);
+    
+    advisorItem.innerHTML = `
+        <div class="advisor-header">
+            <h3>指导老师 <button type="button" class="toggle-btn-advisor" data-index="${advisorIndex}">展开</button> <span class="advisor-name-display" id="advisor-name-display-${advisorIndex}"></span></h3>
+            <div class="advisor-actions">
+                <div class="advisor-remove">
+                    <button type="button" class="remove-advisor-btn" data-index="${advisorIndex}">删除</button>
+                </div>
+            </div>
+        </div>
+        <div class="advisor-content" id="advisor-content-${advisorIndex}">
+            <div class="form-group">
+                <label for="advisor-name-${advisorIndex}" class="required">姓名</label>
+                <input type="text" id="advisor-name-${advisorIndex}" name="advisor_name_${advisorIndex}" required
+                       placeholder="请输入指导老师姓名">
+                <span class="error-message" id="advisor-name-${advisorIndex}-error"></span>
+            </div>
+
+            <div class="form-group">
+                <label for="advisor-phone-${advisorIndex}" class="required">联系电话</label>
+                <input type="tel" id="advisor-phone-${advisorIndex}" name="advisor_phone_${advisorIndex}" required
+                       placeholder="请输入11位手机号" pattern="[0-9]{11}">
+                <span class="error-message" id="advisor-phone-${advisorIndex}-error"></span>
+            </div>
+
+            <div class="form-group">
+                <label for="advisor-email-${advisorIndex}" class="required">电子邮箱</label>
+                <input type="email" id="advisor-email-${advisorIndex}" name="advisor_email_${advisorIndex}" required
+                       placeholder="example@email.com">
+                <span class="error-message" id="advisor-email-${advisorIndex}-error"></span>
+            </div>
+
+            <div class="form-group">
+                <label for="advisor-school-${advisorIndex}" class="required">学校</label>
+                <input type="text" id="advisor-school-${advisorIndex}" name="advisor_school_${advisorIndex}" required
+                       placeholder="请输入学校名称">
+                <span class="error-message" id="advisor-school-${advisorIndex}-error"></span>
+            </div>
+
+            <div class="form-group">
+                <label for="advisor-department-${advisorIndex}" class="required">学院</label>
+                <input type="text" id="advisor-department-${advisorIndex}" name="advisor_department_${advisorIndex}" required
+                       placeholder="请输入学院名称">
+                <span class="error-message" id="advisor-department-${advisorIndex}-error"></span>
+            </div>
+
+            <div class="form-group">
+                <label for="advisor-intro-${advisorIndex}">简介（500字以内）</label>
+                <textarea id="advisor-intro-${advisorIndex}" name="advisor_intro_${advisorIndex}" rows="4"
+                          placeholder="请输入指导老师简介" maxlength="500"></textarea>
+                <span class="error-message" id="advisor-intro-${advisorIndex}-error"></span>
+            </div>
+        </div>
+    `;
+    
+    advisorContainer.appendChild(advisorItem);
+    
+    // 添加删除指导老师的事件监听
+    const removeBtn = advisorItem.querySelector('.remove-advisor-btn');
+    removeBtn.addEventListener('click', function() {
+        removeAdvisor(this.getAttribute('data-index'));
+    });
+    
+    // 添加折叠/展开按钮的事件监听
+    const toggleBtn = advisorItem.querySelector('.toggle-btn-advisor');
+    const advisorContent = advisorItem.querySelector('.advisor-content');
+    toggleBtn.addEventListener('click', function() {
+        const index = this.getAttribute('data-index');
+        toggleAdvisor(index);
+    });
+    
+    // 新添加的指导老师默认展开
+    advisorContent.style.display = 'block';
+    toggleBtn.textContent = '折叠';
+    
+    // 添加姓名输入监听，实时显示在标题中
+    const nameInput = advisorItem.querySelector(`#advisor-name-${advisorIndex}`);
+    const nameDisplay = advisorItem.querySelector(`#advisor-name-display-${advisorIndex}`);
+    if (nameInput && nameDisplay) {
+        nameInput.addEventListener('input', function() {
+            const name = this.value.trim();
+            if (name) {
+                nameDisplay.textContent = `: ${name}`;
+            } else {
+                nameDisplay.textContent = '';
+            }
+        });
+    }
+}
+
+// 折叠/展开指导老师内容
+function toggleAdvisor(index) {
+    const advisorContent = document.getElementById(`advisor-content-${index}`);
+    const toggleBtn = document.querySelector(`.toggle-btn-advisor[data-index="${index}"]`);
+    
+    if (advisorContent.style.display === 'none') {
+        advisorContent.style.display = 'block';
+        toggleBtn.textContent = '折叠';
+    } else {
+        advisorContent.style.display = 'none';
+        toggleBtn.textContent = '展开';
+    }
+}
+
+// 删除指导老师
+function removeAdvisor(index) {
+    const advisorItem = document.querySelector(`.advisor-item[data-advisor-index="${index}"]`);
+    if (advisorItem) {
+        advisorItem.remove();
+        advisorCount = 0;
+        
+        // 隐藏整个部分
+        advisorSection.style.display = 'none';
+    }
+}
+
 // 折叠/展开成员内容
 function toggleMember(index) {
     const memberContent = document.getElementById(`member-content-${index}`);
@@ -317,6 +492,13 @@ function validateMember(memberIndex) {
     let isValid = true;
     const prefix = `member-`;
     
+    // 首先检查成员元素是否存在
+    const memberElement = document.getElementById(`member-name-${memberIndex}`);
+    if (!memberElement) {
+        console.warn(`成员元素不存在: ${memberIndex}`);
+        return true; // 如果元素不存在，跳过验证
+    }
+    
     Object.keys(memberValidationRules).forEach(field => {
         const fieldElement = document.getElementById(`${prefix}${field}-${memberIndex}`);
         if (fieldElement) {
@@ -328,6 +510,36 @@ function validateMember(memberIndex) {
                 isValid = false;
             } else {
                 clearFieldError(`${prefix}${field}-${memberIndex}`);
+            }
+        }
+    });
+    
+    return isValid;
+}
+
+// 验证单个指导老师信息
+function validateAdvisor(advisorIndex) {
+    let isValid = true;
+    const prefix = `advisor-`;
+    
+    // 首先检查指导老师元素是否存在
+    const advisorElement = document.getElementById(`advisor-name-${advisorIndex}`);
+    if (!advisorElement) {
+        console.warn(`指导老师元素不存在: ${advisorIndex}`);
+        return true; // 如果元素不存在，跳过验证
+    }
+    
+    Object.keys(advisorValidationRules).forEach(field => {
+        const fieldElement = document.getElementById(`${prefix}${field}-${advisorIndex}`);
+        if (fieldElement) {
+            const fieldValue = fieldElement.value.trim();
+            const rule = advisorValidationRules[field];
+            
+            if (!rule.validate(fieldValue)) {
+                showFieldError(`${prefix}${field}-${advisorIndex}`, rule.message);
+                isValid = false;
+            } else {
+                clearFieldError(`${prefix}${field}-${advisorIndex}`);
             }
         }
     });
@@ -352,10 +564,15 @@ function validateForm() {
     
     // 验证所有成员信息
     const memberItems = document.querySelectorAll('.member-item');
+    let memberCount = 0;
     memberItems.forEach(item => {
         const memberIndex = item.getAttribute('data-member-index');
-        if (!validateMember(memberIndex)) {
-            isValid = false;
+        // 确保只验证实际存在的成员
+        if (document.getElementById(`member-name-${memberIndex}`)) {
+            memberCount++;
+            if (!validateMember(memberIndex)) {
+                isValid = false;
+            }
         }
     });
     
@@ -369,6 +586,27 @@ function validateForm() {
     
     if (!hasCaptain) {
         showToast('请指定一名队长', { type: 'error', title: '验证失败' });
+        isValid = false;
+    }
+    
+    // 验证所有指导老师信息（如果有）
+    const advisorItems = document.querySelectorAll('.advisor-item');
+    let advisorCount = 0;
+    advisorItems.forEach(item => {
+        const advisorIndex = item.getAttribute('data-advisor-index');
+        // 确保只验证实际存在的指导老师
+        if (document.getElementById(`advisor-name-${advisorIndex}`)) {
+            advisorCount++;
+            if (!validateAdvisor(advisorIndex)) {
+                isValid = false;
+            }
+        }
+    });
+    
+    // 确保成员和指导老师的总数不超过限制
+    const totalMembers = memberCount + advisorCount;
+    if (totalMembers > 6) {
+        showToast('团队总人数（成员+指导老师）不能超过6人', { type: 'error', title: '人数限制' });
         isValid = false;
     }
     
@@ -397,9 +635,15 @@ function getFormData() {
         const memberIndex = item.getAttribute('data-member-index');
         const captainCheckbox = item.querySelector('.captain-checkbox');
         
+        // 根据队长复选框状态确定成员类型
+        let memberType = '队员';
+        if (captainCheckbox && captainCheckbox.checked) {
+            memberType = '队长';
+        }
+        
         members.push({
             name: document.getElementById(`member-name-${memberIndex}`).value.trim(),
-            is_captain: captainCheckbox ? captainCheckbox.checked : false,
+            member_type: memberType,
             school: document.getElementById(`member-school-${memberIndex}`).value.trim(),
             department: document.getElementById(`member-department-${memberIndex}`).value.trim(),
             major_grade: document.getElementById(`member-major-grade-${memberIndex}`).value.trim(),
@@ -407,7 +651,29 @@ function getFormData() {
             email: document.getElementById(`member-email-${memberIndex}`).value.trim(),
             student_id: document.getElementById(`member-student-id-${memberIndex}`).value.trim(),
             role: document.getElementById(`member-role-${memberIndex}`).value.trim(),
-            tech_stack: document.getElementById(`member-tech-stack-${memberIndex}`).value.trim()
+            tech_stack: document.getElementById(`member-tech-stack-${memberIndex}`).value.trim(),
+            desc: ''
+        });
+    });
+    
+    // 指导老师信息
+    const advisorItems = document.querySelectorAll('.advisor-item');
+    
+    advisorItems.forEach(item => {
+        const advisorIndex = item.getAttribute('data-advisor-index');
+        
+        members.push({
+            name: document.getElementById(`advisor-name-${advisorIndex}`).value.trim(),
+            member_type: '指导老师',
+            school: document.getElementById(`advisor-school-${advisorIndex}`).value.trim(),
+            department: document.getElementById(`advisor-department-${advisorIndex}`).value.trim(),
+            major_grade: '', // 指导老师没有专业年级字段
+            phone: document.getElementById(`advisor-phone-${advisorIndex}`).value.trim(),
+            email: document.getElementById(`advisor-email-${advisorIndex}`).value.trim(),
+            student_id: '', // 指导老师没有学号字段
+            role: '指导老师',
+            tech_stack: '', // 指导老师没有技术栈字段
+            desc: document.getElementById(`advisor-intro-${advisorIndex}`).value.trim() // 使用desc字段存储简介
         });
     });
     
@@ -517,7 +783,7 @@ async function submitForm(event) {
     // 清除成员字段错误
     const memberErrorElements = document.querySelectorAll('[id$="-error"]');
     memberErrorElements.forEach(el => {
-        if (el.id.includes('member-')) {
+        if (el.id.includes('member-') || el.id.includes('advisor-')) {
             el.textContent = '';
         }
     });
@@ -613,6 +879,11 @@ form.addEventListener('submit', submitForm);
 // 添加成员按钮事件
 if (addMemberBtn) {
     addMemberBtn.addEventListener('click', addMember);
+}
+
+// 添加指导老师按钮事件
+if (addTeacherBtn) {
+    addTeacherBtn.addEventListener('click', addAdvisor);
 }
 
 // 初始队长选择事件
@@ -730,6 +1001,63 @@ document.addEventListener('DOMContentLoaded', function() {
                 fieldElement.addEventListener('input', function() {
                     if (memberValidationRules[field].validate(this.value.trim())) {
                         clearFieldError(`member-${field}-${memberIndex}`);
+                    }
+                });
+            }
+        });
+    });
+    
+    // 初始化指导老师相关功能（只有在有指导老师时才执行）
+    const toggleAdvisorBtns = document.querySelectorAll('.toggle-btn-advisor');
+    toggleAdvisorBtns.forEach(btn => {
+        const index = btn.getAttribute('data-index');
+        btn.addEventListener('click', function() {
+            toggleAdvisor(index);
+        });
+        
+        // 默认展开第一个（也是唯一的）指导老师
+        if (index == 0) {
+            const advisorContent = document.getElementById(`advisor-content-${index}`);
+            if (advisorContent) {
+                advisorContent.style.display = 'block';
+                btn.textContent = '折叠';
+            }
+        }
+    });
+    
+    // 初始化指导老师验证和姓名显示
+    const advisorItems = document.querySelectorAll('.advisor-item');
+    advisorItems.forEach(item => {
+        const advisorIndex = item.getAttribute('data-advisor-index');
+        
+        // 添加姓名输入监听，实时显示在标题中
+        const nameInput = item.querySelector(`#advisor-name-${advisorIndex}`);
+        const nameDisplay = item.querySelector(`#advisor-name-display-${advisorIndex}`);
+        if (nameInput && nameDisplay) {
+            nameInput.addEventListener('input', function() {
+                const name = this.value.trim();
+                if (name) {
+                    nameDisplay.textContent = `: ${name}`;
+                } else {
+                    nameDisplay.textContent = '';
+                }
+            });
+        }
+        
+        Object.keys(advisorValidationRules).forEach(field => {
+            const fieldElement = document.getElementById(`advisor-${field}-${advisorIndex}`);
+            if (fieldElement) {
+                fieldElement.addEventListener('blur', function() {
+                    if (!advisorValidationRules[field].validate(this.value.trim())) {
+                        showFieldError(`advisor-${field}-${advisorIndex}`, advisorValidationRules[field].message);
+                    } else {
+                        clearFieldError(`advisor-${field}-${advisorIndex}`);
+                    }
+                });
+                
+                fieldElement.addEventListener('input', function() {
+                    if (advisorValidationRules[field].validate(this.value.trim())) {
+                        clearFieldError(`advisor-${field}-${advisorIndex}`);
                     }
                 });
             }
