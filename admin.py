@@ -107,7 +107,7 @@ class TeamView(AuthMixin, ModelView):
 
 class TeamMemberView(AuthMixin, ModelView):
     """
-    团队成员模型的管理视图 - 简化配置，显示所有字段
+    团队成员模型的管理视图 - 重写CSV导出功能，支持自定义选项和包含团队信息
     """
     # 启用列表页面的详情查看功能
     can_view_details = True
@@ -180,6 +180,116 @@ class TeamMemberView(AuthMixin, ModelView):
             ('指导老师', '指导老师')
         ]
     }
+    
+    # 重写CSV导出方法
+    def _export_csv(self, return_url=None):
+        """
+        重写CSV导出方法，支持自定义分隔符和编码，并包含团队信息
+        """
+        from flask import Response, request
+        import csv
+        from io import StringIO
+        from datetime import datetime
+        
+        # 获取查询参数
+        query_params = request.args.to_dict()
+        
+        # 获取自定义参数
+        delimiter = query_params.get('delimiter', ',')  # 分隔符，默认为逗号
+        encoding = query_params.get('encoding', 'utf-8-sig')  # 编码，默认为utf-8-sig（带BOM）
+        include_header = query_params.get('header', 'true').lower() == 'true'  # 是否包含表头
+        
+        # 获取查询结果
+        query = self.get_query()
+        
+        # 创建CSV写入器
+        output = StringIO()
+        
+        # 设置CSV写入器，支持自定义分隔符
+        writer = csv.writer(output, delimiter=delimiter)
+        
+        # 定义导出字段 - 成员字段（移除 team_id 和 team_name，因为这些字段在团队数据中已经包含）
+        all_member_fields = self.column_export_list or self.column_list
+        member_fields = [field for field in all_member_fields if field not in ('team_id', 'team_name')]
+        
+        # 定义团队字段
+        team_fields = ('id', 'team_name', 'competition_track', 'project_name',
+                      'repo_url', 'costrict_uid', 'project_intro', 'tech_solution', 'goals_and_outlook')
+        
+        # 团队字段标签
+        team_field_labels = {
+            'id': '团队ID',
+            'team_name': '团队名称',
+            'competition_track': '参赛赛道',
+            'project_name': '作品名称',
+            'repo_url': '代码仓库链接',
+            'costrict_uid': 'CoStrict 用户ID',
+            'project_intro': '项目简介',
+            'tech_solution': '技术方案',
+            'goals_and_outlook': '目标与展望'
+        }
+        
+        # 合并字段
+        all_fields = list(member_fields) + list(team_fields)
+        
+        # 添加表头
+        if include_header:
+            header = [self.column_labels.get(field, field) for field in member_fields]
+            header += [team_field_labels.get(field, field) for field in team_fields]
+            writer.writerow(header)
+        
+        # 写入数据行
+        for item in query:
+            row = []
+            
+            # 先写入成员字段
+            for field in member_fields:
+                value = getattr(item, field, '')
+                # 处理日期时间格式
+                if hasattr(value, 'strftime'):
+                    value = value.strftime('%Y-%m-%d %H:%M:%S')
+                # 确保值是字符串类型
+                if value is None:
+                    value = ''
+                else:
+                    value = str(value)
+                row.append(value)
+            
+            # 再写入团队字段
+            if hasattr(item, 'team') and item.team:
+                for field in team_fields:
+                    value = getattr(item.team, field, '')
+                    # 处理日期时间格式
+                    if hasattr(value, 'strftime'):
+                        value = value.strftime('%Y-%m-%d %H:%M:%S')
+                    # 确保值是字符串类型
+                    if value is None:
+                        value = ''
+                    else:
+                        value = str(value)
+                    row.append(value)
+            else:
+                # 如果没有关联的团队，填充空值
+                for _ in team_fields:
+                    row.append('')
+            
+            writer.writerow(row)
+        
+        # 创建响应
+        # 生成带时间戳的文件名，避免多次导出时名称重复
+        timestamp = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
+        filename = f'{timestamp}.csv'
+        
+        response = Response(
+            output.getvalue(),
+            mimetype='text/csv',
+            headers={
+                'Content-Disposition': f'attachment; filename={filename}'
+            }
+        )
+        
+        return response
+    
 
 
 class ConfigView(AuthMixin, ModelView):
@@ -258,5 +368,6 @@ def setup_admin(app):
     admin.add_link(MenuLink(name='退出登录', url='/admin/logout', category=None))
     
     return admin
+
 
 
